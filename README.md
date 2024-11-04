@@ -27,6 +27,13 @@ The recent segmentation foundation model, Segment Anything Model (SAM), exhibits
 
 Install the required packages with the command below:
 ```bash
+pip install zero_shot_image_matting
+```
+
+or
+```bash
+git clone https://github.com/naver-ai/ZIM.git
+cd ZIM/
 pip install -r requirements.txt
 ```
 
