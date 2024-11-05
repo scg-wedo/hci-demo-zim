@@ -5,7 +5,7 @@
 
 <sub>NAVER Cloud, ImageVision</sub><br />
 
-[![Paper](https://img.shields.io/badge/Paper-arxiv-red)]([https://arxiv.org](https://arxiv.org/pdf/2411.00626)) 	
+[![Paper](https://img.shields.io/badge/Paper-arxiv-red)](https://arxiv.org/pdf/2411.00626)
 [![Page](https://img.shields.io/badge/Project_page-blue)](https://naver-ai.github.io/ZIM) 	
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/spaces/naver-iv/ZIM_Zero-Shot-Image-Matting)
 [![Data](https://img.shields.io/badge/Data-gray)](https://huggingface.co/datasets/naver-iv/MicroMat-3K)
