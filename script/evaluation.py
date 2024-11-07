@@ -14,8 +14,8 @@ import torch
 import numpy as np
 import random
 
-from zim.utils import get_parser, print_once
-from config.config import generate_config
+from zim_anything.utils import get_parser, print_once
+from zim_config.config import generate_config
 from eval.main_eval import run_eval
 from eval.evaluator import load_sam_evaluator, load_zim_evaluator
 from eval.eval_loader import get_evalloader

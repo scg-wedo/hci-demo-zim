@@ -13,8 +13,8 @@ import gradio as gr
 from gradio_image_prompter import ImagePrompter
 import numpy as np
 import cv2
-from zim import zim_model_registry, ZimPredictor, ZimAutomaticMaskGenerator
-from zim.utils import show_mat_anns
+from zim_anything import zim_model_registry, ZimPredictor, ZimAutomaticMaskGenerator
+from zim_anything.utils import show_mat_anns
 
 def get_shortest_axis(image):
     h, w, _ = image.shape

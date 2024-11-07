@@ -7,12 +7,12 @@ LICENSE file in the root directory of this source tree.
 
 import torch
 from torch import nn
-from typing import Any, Dict, List, Tuple
+from typing import List
 import numpy as np
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from zim.build_model import build_zim_model
-from zim.predictor import ZimPredictor
+from zim_anything.build_model import build_zim_model
+from zim_anything.predictor import ZimPredictor
 from segment_anything import SamPredictor, sam_model_registry
 
 def load_sam_evaluator(config, device):

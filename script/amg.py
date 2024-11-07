@@ -8,7 +8,6 @@ import os, sys
 sys.path.append(os.getcwd())
 
 import argparse
-import numpy as np
 import cv2
 import glob
 from tqdm import tqdm
@@ -16,10 +15,10 @@ from tqdm import tqdm
 import torch
 from torch.multiprocessing import Process
 
-from zim import zim_model_registry, ZimPredictor, ZimAutomaticMaskGenerator
-from zim.utils import show_mat_anns
+from zim_anything import zim_model_registry, ZimAutomaticMaskGenerator
+from zim_anything.utils import show_mat_anns
 
-from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskGenerator
+from segment_anything import sam_model_registry, SamAutomaticMaskGenerator
 
 def get_argparser():
     parser = argparse.ArgumentParser()

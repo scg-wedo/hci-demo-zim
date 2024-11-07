@@ -6,7 +6,7 @@ LICENSE file in the root directory of this source tree.
 """
 
 import torch
-from zim.utils import AverageMeter, print_once
+from zim_anything.utils import AverageMeter, print_once
 from .metric import compute_eval_scores, get_gradfilter
 
 def run_eval(

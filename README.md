@@ -1,6 +1,5 @@
-# ZIM
+# ZIM: Zero-Shot Image Matting for Anything
 
-**ZIM: Zero-Shot Image Matting for Anything** <br />
 [Beomyoung Kim](https://beomyoung-kim.github.io/), Chanyong Shin, [Joonhyun Jeong](https://bestdeveloper691.github.io/), Hyungsik Jung, Se-Yun Lee, Sewhan Chun, [Dong-Hyun Hwang](https://hwangdonghyun.github.io/), Joonsang Yu<br>
 
 <sub>NAVER Cloud, ImageVision</sub><br />
@@ -27,14 +26,13 @@ The recent segmentation foundation model, Segment Anything Model (SAM), exhibits
 
 Install the required packages with the command below:
 ```bash
-pip install zero_shot_image_matting
+pip install zim_anything
 ```
 
 or
 ```bash
 git clone https://github.com/naver-ai/ZIM.git
-cd ZIM/
-pip install -r requirements.txt
+cd ZIM; pip install -e .
 ```
 
 To enable GPU acceleration, please install the compatible `onnxruntime-gpu` package based on your environment settings (CUDA and CuDNN versions), following the instructions in the [onnxruntime installation docs](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements).
@@ -57,7 +55,7 @@ python demo/gradio_demo.py
 
 After the installation step is done, you can utilize our model in just a few lines as below. `ZimPredictor` is compatible with `SamPredictor`, such as `set_image()` or `predict()`.
 ```python
-from zim import zim_model_registry, ZimPredictor
+from zim_anything import zim_model_registry, ZimPredictor
 
 backbone = "vit_l"
 ckpt_p = "results/zim_vit_l_2092"
@@ -74,8 +72,8 @@ masks, _, _ = predictor.predict(<input_prompts>)
 We also provide code for generating masks for an entire image and visualization:
 
 ```python
-from zim import zim_model_registry, ZimAutomaticMaskGenerator
-from zim.utils import show_mat_anns
+from zim_anything import zim_model_registry, ZimAutomaticMaskGenerator
+from zim_anything.utils import show_mat_anns
 
 backbone = "vit_l"
 ckpt_p = "results/zim_vit_l_2092"
@@ -164,6 +162,16 @@ The evaluation result on the MicroMat-3K dataset would be as follows:
 ![Table](https://github.com/naver-ai/ZIM/releases/download/asset-v1/Table1.png)
 
 
+## How To Cite
+
+```
+@article{kim2024zim,
+  title={ZIM: Zero-Shot Image Matting for Anything},
+  author={Kim, Beomyoung and Shin, Chanyong and Jeong, Joonhyun and Jung, Hyungsik and Lee, Se-Yun and Chun, Sewhan and Hwang, Dong-Hyun and Yu, Joonsang},
+  journal={arXiv preprint arXiv:2411.00626},
+  year={2024}
+}
+```
 
 ## License
 
