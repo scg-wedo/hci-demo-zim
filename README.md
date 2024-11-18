@@ -98,7 +98,7 @@ We provide Pretrained-weights of ZIM.
 |   MODEL ZOO  | Link |
 | :------:  | :------:  |
 | zim_vit_b | [download](https://huggingface.co/naver-iv/zim-anything-vitb/tree/main/zim_vit_b_2043) |
-| zim_vit_l | [download](https://huggingface.co/naver-iv/zim-anything-vitb/tree/main/zim_vit_l_2092) |
+| zim_vit_l | [download](https://huggingface.co/naver-iv/zim-anything-vitl/tree/main/zim_vit_l_2092) |
 
 
 ## Dataset Preparation
