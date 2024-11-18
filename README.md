@@ -6,8 +6,10 @@
 
 [![Paper](https://img.shields.io/badge/Paper-arxiv-red)](https://arxiv.org/pdf/2411.00626)
 [![Page](https://img.shields.io/badge/Project_page-blue)](https://naver-ai.github.io/ZIM) 	
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/spaces/naver-iv/ZIM_Zero-Shot-Image-Matting)
-[![Data](https://img.shields.io/badge/Data-gray)](https://huggingface.co/datasets/naver-iv/MicroMat-3K)
+[![🤗 demo](https://img.shields.io/badge/Hugging%20Face-Demo-FFD21E?logo=huggingface&logo)](https://huggingface.co/spaces/naver-iv/ZIM_Zero-Shot-Image-Matting)
+[![🤗 Dataset](https://img.shields.io/badge/Hugging%20Face%20Dataset-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/datasets/naver-iv/MicroMat-3K)
+[![🤗 Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://huggingface.co/models?search=naver-iv/zim)
+[![🤗 Collection](https://img.shields.io/badge/Hugging%20Face%20Collection-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/collections/naver-iv/zim-6739a32211b7efeeed83b674)
 
 ![Teaser](https://github.com/naver-ai/ZIM/releases/download/asset-v1/amg.gif)
 ![Teaser](https://github.com/naver-ai/ZIM/releases/download/asset-v1/teaser.png)
@@ -95,8 +97,8 @@ bash script/run_amg.sh
 We provide Pretrained-weights of ZIM.
 |   MODEL ZOO  | Link |
 | :------:  | :------:  |
-| zim_vit_b | [download](https://github.com/naver-ai/ZIM/releases/download/ckpt-v1/zim_vit_b_2043.tar) |
-| zim_vit_l | [download](https://github.com/naver-ai/ZIM/releases/download/ckpt-v1/zim_vit_l_2092.tar) |
+| zim_vit_b | [download](https://huggingface.co/naver-iv/zim-anything-vitb/tree/main/zim_vit_b_2043) |
+| zim_vit_l | [download](https://huggingface.co/naver-iv/zim-anything-vitb/tree/main/zim_vit_l_2092) |
 
 
 ## Dataset Preparation
