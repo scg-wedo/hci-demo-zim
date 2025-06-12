@@ -1,0 +1,5 @@
+__pycache__/
+*.onnx
+*.pth
+zim-anything-vitb/
+zim-anything-vitl/
