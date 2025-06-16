@@ -1,5 +1,21 @@
 # ZIM: Zero-Shot Image Matting for Anything
 
+## HCI: Environment Setup on Local Windows
+```bash
+conda create -n zim python=3.10
+conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0  pytorch-cuda=11.8 -c pytorch -c nvidia
+pip install -r requirements.txt
+pip install -e .
+```
+
+## HCI: Run gradio demo on Docker
+```bash
+docker build -t zim .
+docker run -p 11928:11928 -it --rm --gpus all zim
+```
+Your Gradio app should now be accessible at http://localhost:11928
+
+
 [Beomyoung Kim](https://beomyoung-kim.github.io/), Chanyong Shin, [Joonhyun Jeong](https://bestdeveloper691.github.io/), Hyungsik Jung, Se-Yun Lee, Sewhan Chun, [Dong-Hyun Hwang](https://hwangdonghyun.github.io/), Joonsang Yu<br>
 
 <sub>NAVER Cloud, ImageVision</sub><br />

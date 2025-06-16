@@ -1,5 +1,7 @@
 __pycache__/
 *.onnx
 *.pth
+examples/*
+*.jpg
 zim-anything-vitb/
 zim-anything-vitl/
