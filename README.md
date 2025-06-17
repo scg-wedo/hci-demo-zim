@@ -9,9 +9,10 @@ pip install -e .
 ```
 
 ## HCI: Run gradio demo on Docker
+Use absolute path to the 'output' folder instead of 'D:\3d-recon\hci-demo-zim\output'
 ```bash
 docker build -t zim .
-docker run -p 11928:11928 -it --rm --gpus all zim
+docker run -p 11928:11928 -v D:\3d-recon\hci-demo-zim\output:/home/user/worker/output/ -it --rm --gpus all zim
 ```
 Your Gradio app should now be accessible at http://localhost:11928
 

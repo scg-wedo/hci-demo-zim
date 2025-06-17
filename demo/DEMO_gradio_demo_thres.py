@@ -8,14 +8,15 @@ import os, sys
 sys.path.append(os.getcwd())
 
 # Gradio demo, comparison SAM vs ZIM
-import os
+import json
+import datetime
+import uuid
 import torch
 import gradio as gr
 from gradio_image_prompter import ImagePrompter
 import numpy as np
 import cv2
 from zim_anything import zim_model_registry, ZimPredictor, ZimAutomaticMaskGenerator
-from zim_anything.utils import show_mat_anns
 
 def get_shortest_axis(image):
     h, w, _ = image.shape
@@ -24,27 +25,25 @@ def get_shortest_axis(image):
 def reset_image(image, prompts):
     if image is None:
         image = np.zeros((1024, 1024, 3), dtype=np.uint8)
+        output_dir = None
     else:
         image = image['image']
+
+        # create directory for this upload
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        directory_name = f"output/{timestamp}_{uuid.uuid4().hex[:8]}"
+        os.makedirs(directory_name, exist_ok=True)
+
+        cv2.imwrite(os.path.join(directory_name, "input.jpg"), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
+        # Store directory in prompts or a state
+        prompts = {"output_dir": directory_name}
+
     zim_predictor.set_image(image)
-    prompts = dict()
+
     black = np.zeros(image.shape[:2], dtype=np.uint8)
 
     return (image, image, image, black, prompts)
-
-def reset_example_image(image, prompts):
-    if image is None:
-        image = np.zeros((1024, 1024, 3), dtype=np.uint8)
-
-    zim_predictor.set_image(image)
-    prompts = dict()
-    black = np.zeros(image.shape[:2], dtype=np.uint8)
-
-    image_dict = {}
-    image_dict['image'] = image
-    image_dict['prompts'] = prompts
-
-    return (image, image_dict, image, image, image, black, black, black, black, prompts)
 
     
 def run_model(image, prompts):
@@ -109,6 +108,8 @@ def update_scribble(image, scribble, prompts):
     if "bbox" in prompts:
         del prompts["bbox"]
     
+    directory = prompts.get("output_dir") if prompts else None
+
     prompts = dict() # reset prompt
     scribble_mask = scribble["layers"][0][..., -1] > 0
 
@@ -120,8 +121,29 @@ def update_scribble(image, scribble, prompts):
     prompts["scribble"] = scribble_sampled
     
     zim_mask = run_model(image, prompts)
+    img_with_zim_mask = draw_images(image, zim_mask, prompts)
 
-    return zim_mask, prompts
+    if directory is None:
+        directory = "output/backup"
+    os.makedirs(directory, exist_ok=True)
+
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    zim_mask_file = os.path.join(directory, f"{timestamp}_zim_scribble_mask.jpg")
+    cv2.imwrite(zim_mask_file, zim_mask)
+
+    # img_with_zim_mask_file = os.path.join(directory, f"{timestamp}_zim_scribble_img_with_mask.jpg")
+    # cv2.imwrite(img_with_zim_mask_file, cv2.cvtColor(img_with_zim_mask, cv2.COLOR_RGB2BGR))
+
+    prompts_save = prompts.copy()
+    prompts_save["scribble"] = scribble_sampled.tolist()  # Convert to list for JSON serialization
+    prompts_save["output_dir"] = directory  # Save output directory in prompts
+    with open(os.path.join(directory, f"{timestamp}_zim_scribble_prompt.json"), "w") as f:
+        json.dump(prompts_save, f, indent=4)
+
+    prompts['output_dir'] = directory  # Update prompts with output directory
+
+    return zim_mask, img_with_zim_mask, prompts
 
 
 def draw_point(img, pt, size, color):
@@ -164,10 +186,7 @@ def draw_images(image, mask, prompts):
 
     size = int(minor / 200)
 
-    return (
-        img,
-        img_with_mask,
-    )
+    return img_with_mask
 
 def draw_images_black_background(image, mask, prompts):
     if len(prompts) == 0 or mask.shape[1] == 1:
@@ -180,15 +199,8 @@ def draw_images_black_background(image, mask, prompts):
 
     def blending(image, mask):
         mask = np.float32(mask) / 255
-        # blended_image = np.zeros_like(image, dtype=np.float32)
-        # blended_image[:, :, :] = [108, 0, 192]
-        # blended_image = (image * 0.5) + (blended_image * 0.5)
-    
-        # img_with_mask = mask[:, :, None] * blended_image + (1 - mask[:, :, None]) * image
         img_with_mask = np.uint8(image)
-
         img_with_mask[mask==0] = 0
-
         return img_with_mask
 
     img_with_mask = blending(image, mask)
@@ -241,8 +253,25 @@ def get_point_or_box_prompts(img, prompts):
         del prompts['bbox']
 
     zim_mask = run_model(image, prompts)
+    img_with_zim_mask = draw_images(image, zim_mask, prompts)
 
-    return image, zim_mask, prompts
+    directory = prompts.get("output_dir") if prompts else None
+    if directory is None:
+        directory = "output/backup"
+    os.makedirs(directory, exist_ok=True)
+
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    zim_mask_file = os.path.join(directory, f"{timestamp}_zim_mask.jpg")
+    cv2.imwrite(zim_mask_file, zim_mask)
+
+    # img_with_zim_mask_file = os.path.join(directory, f"{timestamp}_zim_img_with_mask.jpg")
+    # cv2.imwrite(img_with_zim_mask_file, cv2.cvtColor(img_with_zim_mask, cv2.COLOR_RGB2BGR))
+
+    with open(os.path.join(directory, f"{timestamp}_zim_prompt.json"), "w") as f:
+        json.dump(prompts, f, indent=4)
+
+    return image, zim_mask, img_with_zim_mask, prompts
 
 def get_examples():
     assets_dir = os.path.join(os.path.dirname(__file__), 'examples')
@@ -262,14 +291,37 @@ def get_mask_area(img, binary):
 
     return masked_img
 
-def apply_threshold(img, zim_mask_array, threshold):
+def apply_threshold(img, zim_mask_array, threshold, prompts=None):
+    """
+    Apply threshold and save results to directory.
+    """
+    directory = prompts.get("output_dir") if prompts else None
+    
+    if directory is None:
+        directory = "output/backup"
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Threshold mask
     binary = (zim_mask_array > threshold).astype(np.uint8) * 255
     masked_img = get_mask_area(img, binary)
 
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    mask_file = os.path.join(directory, f"{timestamp}_thres_mask_{threshold}.jpg")
+    # masked_file = os.path.join(directory, f"{timestamp}_thres_masked_img.jpg")
+    # mask_with_img_file = os.path.join(directory, f"{timestamp}_thres_mask_with_img.jpg")
+
+    # Save files
+    cv2.imwrite(mask_file, binary)
+    # cv2.imwrite(masked_file, cv2.cvtColor(masked_img, cv2.COLOR_RGB2BGR))
     mask_with_img = img.copy()
-    mask_with_img[binary==255] = 255
+    mask_with_img[binary == 255] = 255
+    # mask_with_img_save = cv2.cvtColor(mask_with_img, cv2.COLOR_RGB2BGR)
+    # cv2.imwrite(mask_with_img_file, mask_with_img_save)
 
     return binary, masked_img, mask_with_img
+
 
 if __name__ == "__main__":
     backbone = "vit_l"
@@ -373,15 +425,15 @@ if __name__ == "__main__":
                 zim_mask_thresh = gr.Image()
             with gr.Tab(label="ZIM Masked Image"):
                 masked_img = gr.Image()
-            
+
         img_with_point_or_box.upload(
             reset_image,
             [img_with_point_or_box, prompts],
             [
-                img,
-                img_with_scribble,
-                img_with_zim_mask,
-                zim_mask,
+                img, 
+                img_with_scribble, 
+                img_with_zim_mask, 
+                zim_mask, 
                 prompts,
             ],
         )
@@ -389,24 +441,8 @@ if __name__ == "__main__":
         run_bttn.click(
             get_point_or_box_prompts,
             [img_with_point_or_box, prompts],
-            [img, zim_mask, prompts]
+            [img, zim_mask, img_with_zim_mask, prompts]
         )
-
-        zim_mask.change(
-            draw_images,
-            [img, zim_mask, prompts],
-            [
-                img, img_with_zim_mask, 
-            ],
-        )
-
-        # zim_mask.change(
-        #     draw_images_black_background,
-        #     [img, zim_mask, prompts],
-        #     [
-        #         img, img_with_zim_mask_black, 
-        #     ],
-        # )
 
         scribble_reset_bttn.click(
             reset_scribble,
@@ -416,18 +452,12 @@ if __name__ == "__main__":
         scribble_bttn.click(
             update_scribble,
             [img, img_with_scribble, prompts],
-            [zim_mask, prompts],
+            [zim_mask, img_with_zim_mask, prompts],
         )
-
-        # apply_thresh_btn.click(
-        #     fn=apply_threshold,
-        #     inputs=[img, zim_mask, threshold_slider],
-        #     outputs=[zim_mask_thresh, masked_img, mask_with_img]
-        # )
 
         threshold_slider.change(
             fn=apply_threshold,
-            inputs=[img, zim_mask, threshold_slider],
+            inputs=[img, zim_mask, threshold_slider, prompts],
             outputs=[zim_mask_thresh, masked_img, mask_with_img]
         )
 

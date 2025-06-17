@@ -5,3 +5,5 @@ examples/*
 *.jpg
 zim-anything-vitb/
 zim-anything-vitl/
+output/*
+!output/.keep

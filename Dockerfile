@@ -42,6 +42,7 @@ COPY zim_config/ ./zim_config/
 COPY setup.py ./setup.py
 COPY requirements.txt ./requirements.txt
 
+RUN mkdir -p /home/user/worker/output/
 
 # Download pretrained model weights
 RUN mkdir -p /home/user/worker/results/
