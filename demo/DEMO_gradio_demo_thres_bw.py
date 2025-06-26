@@ -164,7 +164,7 @@ def draw_images(image, mask, prompts):
     def blending(image, mask):
         mask = np.float32(mask) / 255
         blended_image = np.zeros_like(image, dtype=np.float32)
-        blended_image[:, :, :] = [255, 0, 0]
+        blended_image[:, :, :] = [108, 0, 192]
         blended_image = (image * 0.5) + (blended_image * 0.5)
     
         img_with_mask = mask[:, :, None] * blended_image + (1 - mask[:, :, None]) * image
@@ -188,39 +188,39 @@ def draw_images(image, mask, prompts):
 
     return img_with_mask
 
-# def draw_images_black_background(image, mask, prompts):
-#     if len(prompts) == 0 or mask.shape[1] == 1:
-#         return image, image, image
+def draw_images_black_background(image, mask, prompts):
+    if len(prompts) == 0 or mask.shape[1] == 1:
+        return image, image, image
 
-#     minor = get_shortest_axis(image)
-#     size = int(minor / 80)
+    minor = get_shortest_axis(image)
+    size = int(minor / 80)
 
-#     image = np.float32(image)
+    image = np.float32(image)
 
-#     def blending(image, mask):
-#         mask = np.float32(mask) / 255
-#         img_with_mask = np.uint8(image)
-#         img_with_mask[mask==0] = 0
-#         return img_with_mask
+    def blending(image, mask):
+        mask = np.float32(mask) / 255
+        img_with_mask = np.uint8(image)
+        img_with_mask[mask==0] = 0
+        return img_with_mask
 
-#     img_with_mask = blending(image, mask)
-#     img_with_point = img_with_mask.copy()
+    img_with_mask = blending(image, mask)
+    img_with_point = img_with_mask.copy()
 
-#     if "point" in prompts:
-#         for type, pts in prompts["point"]:
-#             if type == "Positive":
-#                 color = (0, 0, 255)
-#                 draw_point(img_with_point, pts, size, color)
-#             elif type == "Negative":
-#                 color = (255, 0, 0)
-#                 draw_point(img_with_point, pts, size, color)
+    if "point" in prompts:
+        for type, pts in prompts["point"]:
+            if type == "Positive":
+                color = (0, 0, 255)
+                draw_point(img_with_point, pts, size, color)
+            elif type == "Negative":
+                color = (255, 0, 0)
+                draw_point(img_with_point, pts, size, color)
 
-#     size = int(minor / 200)
+    size = int(minor / 200)
 
-#     return (
-#         img,
-#         img_with_mask,
-#     )
+    return (
+        img,
+        img_with_mask,
+    )
 
 
 def get_point_or_box_prompts(img, prompts):
@@ -315,14 +315,12 @@ def apply_threshold(img, zim_mask_array, threshold, prompts=None):
     # Save files
     cv2.imwrite(mask_file, binary)
     # cv2.imwrite(masked_file, cv2.cvtColor(masked_img, cv2.COLOR_RGB2BGR))
-    # mask_with_img = img.copy()
-    # mask_with_img[binary == 255] = 255
-    img_with_zim_mask = draw_images(img, binary, prompts)
-
+    mask_with_img = img.copy()
+    mask_with_img[binary == 255] = 255
     # mask_with_img_save = cv2.cvtColor(mask_with_img, cv2.COLOR_RGB2BGR)
     # cv2.imwrite(mask_with_img_file, mask_with_img_save)
 
-    return binary, masked_img, img_with_zim_mask
+    return binary, masked_img, mask_with_img
 
 
 if __name__ == "__main__":
