@@ -16,6 +16,7 @@ import gradio as gr
 from gradio_image_prompter import ImagePrompter
 import numpy as np
 import cv2
+from PIL import Image
 from zim_anything import zim_model_registry, ZimPredictor, ZimAutomaticMaskGenerator
 
 def get_shortest_axis(image):
@@ -34,7 +35,11 @@ def reset_image(image, prompts):
         directory_name = f"output/{timestamp}_{uuid.uuid4().hex[:8]}"
         os.makedirs(directory_name, exist_ok=True)
 
-        cv2.imwrite(os.path.join(directory_name, "input.jpg"), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+        # cv2.imwrite(os.path.join(directory_name, "input.jpg"), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
+        # save at 300 dpi
+        image_pil = Image.fromarray(image)
+        image_pil.save(os.path.join(directory_name, "input.jpg"), dpi=(300, 300))
 
         # Store directory in prompts or a state
         prompts = {"output_dir": directory_name}
@@ -130,7 +135,9 @@ def update_scribble(image, scribble, prompts):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
     zim_mask_file = os.path.join(directory, f"{timestamp}_zim_scribble_mask.jpg")
-    cv2.imwrite(zim_mask_file, zim_mask)
+    # cv2.imwrite(zim_mask_file, zim_mask)
+    zim_mask_pil = Image.fromarray(zim_mask)
+    zim_mask_pil.save(zim_mask_file, dpi=(300, 300))
 
     # img_with_zim_mask_file = os.path.join(directory, f"{timestamp}_zim_scribble_img_with_mask.jpg")
     # cv2.imwrite(img_with_zim_mask_file, cv2.cvtColor(img_with_zim_mask, cv2.COLOR_RGB2BGR))
@@ -263,7 +270,10 @@ def get_point_or_box_prompts(img, prompts):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
     zim_mask_file = os.path.join(directory, f"{timestamp}_zim_mask.jpg")
-    cv2.imwrite(zim_mask_file, zim_mask)
+    # cv2.imwrite(zim_mask_file, zim_mask)
+    zim_mask_pil = Image.fromarray(zim_mask)
+    zim_mask_pil.save(zim_mask_file, dpi=(300, 300))
+
 
     # img_with_zim_mask_file = os.path.join(directory, f"{timestamp}_zim_img_with_mask.jpg")
     # cv2.imwrite(img_with_zim_mask_file, cv2.cvtColor(img_with_zim_mask, cv2.COLOR_RGB2BGR))
@@ -313,7 +323,11 @@ def apply_threshold(img, zim_mask_array, threshold, prompts=None):
     # mask_with_img_file = os.path.join(directory, f"{timestamp}_thres_mask_with_img.jpg")
 
     # Save files
-    cv2.imwrite(mask_file, binary)
+    # cv2.imwrite(mask_file, binary)
+    binary_pil = Image.fromarray(binary)
+    binary_pil.save(mask_file, dpi=(300, 300))
+
+    
     # cv2.imwrite(masked_file, cv2.cvtColor(masked_img, cv2.COLOR_RGB2BGR))
     # mask_with_img = img.copy()
     # mask_with_img[binary == 255] = 255
