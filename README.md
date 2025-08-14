@@ -9,6 +9,17 @@ pip install -e .
 ```
 Pls also download and put decoder.onnx and encoder.onnx in results/ folder
 
+## HCI: Run gradio demo on Local
+1. Simple Zim with Threshold adjusting
+```bash
+python demo\DEMO_gradio_demo_thres.py
+```
+2. Input Image + auto_detect.json => Zim Walls and Floor mask with Threshold adjusting and saving the output masks
+ ```bash
+python demo\GRADIO_bbox_to_zim.py
+```
+<img src="assets\bbox-to-zim.png"/>
+
 ## HCI: Run gradio demo on Docker
 Use absolute path to the 'output' folder instead of 'D:\3d-recon\hci-demo-zim\output'
 ```bash
