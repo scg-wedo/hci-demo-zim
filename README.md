@@ -7,6 +7,7 @@ conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0  pytorch-cuda
 pip install -r requirements.txt
 pip install -e .
 ```
+Pls also download and put decoder.onnx and encoder.onnx in results/ folder
 
 ## HCI: Run gradio demo on Docker
 Use absolute path to the 'output' folder instead of 'D:\3d-recon\hci-demo-zim\output'

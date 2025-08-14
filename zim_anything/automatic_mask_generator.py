@@ -10,6 +10,7 @@ LICENSE file in the root directory of this source tree.
 import numpy as np
 import torch
 from torchvision.ops.boxes import batched_nms, box_area
+import time
 
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -199,6 +200,7 @@ class ZimAutomaticMaskGenerator:
         return curr_anns
 
     def _generate_masks(self, image: np.ndarray) -> MaskData:
+        print("_generate_masks called")
         orig_size = image.shape[:2]
         crop_boxes, layer_idxs = generate_crop_boxes(
             orig_size, self.crop_n_layers, self.crop_overlap_ratio
@@ -224,6 +226,7 @@ class ZimAutomaticMaskGenerator:
             data.filter(keep_by_nms)
 
         data.to_numpy()
+        print("_generate_masks finished")
         return data
 
     def _process_crop(
@@ -233,6 +236,7 @@ class ZimAutomaticMaskGenerator:
         crop_layer_idx: int,
         orig_size: Tuple[int, ...],
     ) -> MaskData:
+        print("_process_crop called")
         # Crop the image and calculate embeddings
         x0, y0, x1, y1 = crop_box
         cropped_im = image[y0:y1, x0:x1, :]
@@ -242,15 +246,21 @@ class ZimAutomaticMaskGenerator:
         # Get points for this crop
         points_scale = np.array(cropped_im_size)[None, ::-1]
         points_for_image = self.point_grids[crop_layer_idx] * points_scale
+        print("points_for_image.shape", points_for_image.shape)
 
         # Generate masks for this crop in batches
         data = MaskData()
+        batch_count = 0
         for (points,) in batch_iterator(self.points_per_batch, points_for_image):
+            print("points in this batch", points.shape)
             batch_data = self._process_batch(points, cropped_im_size, crop_box, orig_size)
             data.cat(batch_data)
             del batch_data
+            batch_count += 1
+            print(f"Processed {batch_count} batches.")
         self.predictor.reset_image()
 
+        print("batched_nms called")
         # Remove duplicates within this crop.
         keep_by_nms = batched_nms(
             data["boxes"].float(),
@@ -259,12 +269,13 @@ class ZimAutomaticMaskGenerator:
             iou_threshold=self.box_nms_thresh,
         )
         data.filter(keep_by_nms)
+        print("batched_nms finished")
 
         # Return to the original image frame
         data["boxes"] = uncrop_boxes_xyxy(data["boxes"], crop_box)
         data["points"] = uncrop_points(data["points"], crop_box)
         data["crop_boxes"] = torch.tensor([crop_box for _ in range(len(data["rles"]))])
-
+        print("_process_crop finished")
         return data
 
     def _process_batch(
@@ -274,6 +285,8 @@ class ZimAutomaticMaskGenerator:
         crop_box: List[int],
         orig_size: Tuple[int, ...],
     ) -> MaskData:
+        print("_process_batch called")
+        start_time = time.time()
         orig_h, orig_w = orig_size
 
         # Run model on this batch
@@ -323,7 +336,10 @@ class ZimAutomaticMaskGenerator:
         data["logits"] = uncrop_masks(data["logits"], crop_box, orig_h, orig_w)
         data["rles"] = mask_to_rle_pytorch(data["masks"])
         del data["masks"]
-
+        print("_process_batch finished")
+        end_time = time.time()
+        duration = end_time - start_time
+        print(f"_process_batch executed in {duration:.4f} seconds.")
         return data
 
     @staticmethod
@@ -338,6 +354,7 @@ class ZimAutomaticMaskGenerator:
 
         Requires open-cv as a dependency.
         """
+        print("postprocess_small_regions called")
         if len(mask_data["rles"]) == 0:
             return mask_data
 
@@ -374,5 +391,5 @@ class ZimAutomaticMaskGenerator:
                 mask_data["rles"][i_mask] = mask_to_rle_pytorch(mask_torch)[0]
                 mask_data["boxes"][i_mask] = boxes[i_mask]  # update res directly
         mask_data.filter(keep_by_nms)
-
+        print("postprocess_small_regions finished")
         return mask_data

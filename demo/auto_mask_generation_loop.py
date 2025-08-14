@@ -10,11 +10,11 @@ import time
 backbone = "vit_l"
 ckpt_p = "results/zim_vit_l_2092"
 model = zim_model_registry[backbone](checkpoint=ckpt_p)
-# if torch.cuda.is_available():
-model.cpu()
+if torch.cuda.is_available():
+    model.cuda()
 
 # Folder paths
-input_folder = r"D:\3d-recon\RoomSceneSegmentation\RoomSceneImage-40"
+input_folder = r"D:\3d-recon\RoomSceneSegmentation\input_image_downsampled"
 output_folder = r"D:\3d-recon\hci-demo-zim\output_automask"
 os.makedirs(output_folder, exist_ok=True)
 

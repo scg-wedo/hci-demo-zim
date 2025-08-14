@@ -7,3 +7,7 @@ zim-anything-vitb/
 zim-anything-vitl/
 output/*
 !output/.keep
+output_automask/
+output_automask_*/
+results/
+zim_anything.egg-info/

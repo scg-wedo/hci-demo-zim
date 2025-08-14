@@ -296,6 +296,8 @@ def get_mask_area(img, binary):
     if len(img.shape) == 3 and img.shape[2] == 3:
         binary_mask = np.repeat(binary_mask[:, :, None], 3, axis=2)
 
+    binary_mask[img==1] = 1  # Set all 1s to 0 in the image
+
     # Apply mask
     masked_img = img * binary_mask
 
