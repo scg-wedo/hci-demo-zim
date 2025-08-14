@@ -9,6 +9,12 @@ pip install -e .
 ```
 Pls also download and put decoder.onnx and encoder.onnx in results/ folder
 
+## HCI: Run gradio demo on Local
+```bash
+conda activate zim
+python demo\DEMO_gradio_demo_thres.py
+```
+
 ## HCI: Run gradio demo on Docker
 Use absolute path to the 'output' folder instead of 'D:\3d-recon\hci-demo-zim\output'
 ```bash
